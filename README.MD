@@ -35,37 +35,32 @@ test case 1
   - Steps: Preset=`evenly_spaced`, List size=`5`, Start=`3`, Step=`2`, click `Generate Set`.
   - Check: List table shows `(index,value)` = `(0,3) (1,5) (2,7) (3,9) (4,11)`.
 
-![Test Case 1](images/testcase1.png)
 
 test case 2
   - Steps: Preset=`evenly_spaced`, Step=`0` (or `-1`), click `Generate Set`.
   - Check: Error
 
-![Test Case](images/image (11).png)
 
 test case 3
   - Steps: Preset=`primes`, List size=`10`, click `Generate Set`.
   - Check: Values are `2, 3, 5, 7, 11, 13, 17, 19, 23, 29` 
 
-![photo](images/image(12).png)
 
 test case 4
   - Steps: Preset=`perfect_squares`, List size=`6`, click `Generate Set`.
   - Check: Values are `1, 4, 9, 16, 25, 36`.
 
-![photo](images/image(13).png)
 
 test case 5: update score on loss
   - Steps: Click `Start Game`, then submit an incorrect guess 3 times 
   - Check: status says incorrect Trace table becomes visible, `Restart Game` button appears, Guess/Submit disable, Score decreases by `1`.
 
-![photo](images/image(14).png)
+
 
 test case 6: update score on win
   - Steps: Click `Start Game`, then when correct answer is given by user
   Check: Status says correct, Trace is visible, Score increases by `1`, `Restart Game` button appears, Guess/Submit disable
 
-![photo](images/image(15).png)
 
 #### Steps to Run
 1) Create and activate a virtual environment:
