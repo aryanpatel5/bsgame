@@ -74,7 +74,7 @@ VERIFICATION OF TESTS IS IN images/
 4) Open the local Gradio URL printed in the terminal.
 
 ##### Hugging Face Link
-- Deployed app : https://huggingface.co/spaces/ap555/bsgame
+- Deployed app : https://huggingface.co/spaces/ap555/bsapp
 
 ###### Author 
 - Aryan Patel
