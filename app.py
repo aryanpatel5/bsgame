@@ -4,7 +4,9 @@ import gradio as gr
 
 
 def _to_int(v, name):
+    """Coerce Gradio numeric inputs into an `int` (and reject non-integers)."""
     if v is None or isinstance(v, bool):
+        # `bool` is a subclass of `int`; treat it as invalid user input here.
         raise gr.Error(f"{name} must be an integer.")
     if isinstance(v, int):
         return v
@@ -14,12 +16,14 @@ def _to_int(v, name):
 
 
 def _is_prime(n):
+    """Return True iff `n` is a prime number (trial division)."""
     if n < 2:
         return False
     if n % 2 == 0:
         return n == 2
     d = 3
     while d * d <= n:
+        # Only need to test divisors up to sqrt(n); skip even candidates.
         if n % d == 0:
             return False
         d += 2
@@ -27,8 +31,10 @@ def _is_prime(n):
 
 
 def _first_n_primes(n):
+    """Generate the first `n` primes."""
     out, x = [], 2
     while len(out) < n:
+        # Grow the list until we hit the requested count.
         if _is_prime(x):
             out.append(x)
         x += 1
@@ -36,11 +42,13 @@ def _first_n_primes(n):
 
 
 def generate_list(kind, n, start, step):
+    """Generate a deterministic list based on a preset."""
     if n <= 0:
         raise ValueError("List size must be > 0.")
     if kind == "evenly_spaced":
         if step <= 0:
             raise ValueError("Step must be > 0.")
+        # List comprehension: fast + idiomatic for derived lists.
         return [start + i * step for i in range(n)]
     if kind == "primes":
         return _first_n_primes(n)
@@ -50,10 +58,12 @@ def generate_list(kind, n, start, step):
 
 
 def binary_search_trace(arr, target):
+    """Binary search that records each step for the UI trace table."""
     rows = []
     low, high, step = 0, len(arr) - 1, 0
     while low <= high:
         step += 1
+        # Integer midpoint to stay in array index space.
         mid = (low + high) // 2
         mid_value = arr[mid]
         if target == mid_value:
@@ -61,14 +71,17 @@ def binary_search_trace(arr, target):
             break
         if target < mid_value:
             rows.append([step, low, high, mid, mid_value, "left"])
+            # Discard the right half (inclusive of `mid`).
             high = mid - 1
         else:
             rows.append([step, low, high, mid, mid_value, "right"])
+            # Discard the left half (inclusive of `mid`).
             low = mid + 1
     return rows, len(rows)
 
 
 def _state(arr=None, target=None, attempts=0, active=False, steps=0, trace=None, score=0):
+    """Build the dict persisted inside `gr.State`."""
     return {
         "arr": arr,
         "target": target,
@@ -81,11 +94,13 @@ def _state(arr=None, target=None, attempts=0, active=False, steps=0, trace=None,
 
 
 def _start_round(state, status):
+    """Start a new round while preserving the current score."""
     arr = state.get("arr") if isinstance(state, dict) else None
     if not arr:
         raise gr.Error("Generate a set first.")
     score = int(state.get("score", 0)) if isinstance(state, dict) else 0
 
+    # Choose a target and precompute its binary-search trace.
     target = random.choice(arr)
     trace, steps = binary_search_trace(arr, target)
     return (
@@ -101,10 +116,14 @@ def _start_round(state, status):
 
 
 def on_preset_change(preset):
+    # Only the evenly-spaced preset needs `start` and `step` controls.
     show = preset == "evenly_spaced"
     return gr.update(visible=show), gr.update(visible=show)
 
+
 def on_generate_set(n, preset, start, step, state):
+    """Validate inputs, generate the list, and reset round-specific UI."""
+    # Gradio Number/Slider values can arrive as float; normalize up-front.
     n = _to_int(n, "List size")
     start = _to_int(start, "Start")
     step = _to_int(step, "Step")
@@ -115,6 +134,7 @@ def on_generate_set(n, preset, start, step, state):
     except ValueError as e:
         raise gr.Error(str(e))
 
+    # Dataframe expects rows; keep index alongside each value for clarity.
     list_rows = [[i, v] for i, v in enumerate(arr)]
     return (
         _state(arr=arr, score=score),
@@ -130,18 +150,23 @@ def on_generate_set(n, preset, start, step, state):
 
 
 def on_start_game(state):
+    # Simple wrapper to keep event wiring readable.
     return _start_round(state, "Game started. 3 tries.")
 
 
 def on_restart_round(state):
+    # Same logic as start, different status message.
     return _start_round(state, "New round. 3 tries.")
 
 
 def on_submit_guess(guess, state):
+    """Process a guess and return updated component values/props."""
+    # Defensive checks: the UI can get out of sync with backend state.
     if not isinstance(state, dict) or not state.get("active") or not state.get("arr"):
         raise gr.Error("Start the game first.")
 
     guess = _to_int(guess, "Guess")
+    # Compute next state explicitly so updates are predictable.
     attempts = int(state.get("attempts", 0)) + 1
     steps = int(state.get("steps", 0))
     trace = state.get("trace") or []
@@ -151,6 +176,7 @@ def on_submit_guess(guess, state):
 
     if guess == steps:
         score += 1
+        # Correct: end the round, reveal trace, lock inputs.
         return (
             _state(arr=arr, target=target, attempts=attempts, active=False, steps=steps, trace=trace, score=score),
             str(target),
@@ -164,6 +190,7 @@ def on_submit_guess(guess, state):
 
     if attempts >= 3:
         score -= 1
+        # Out of tries: end the round, reveal trace, lock inputs.
         return (
             _state(arr=arr, target=target, attempts=attempts, active=False, steps=steps, trace=trace, score=score),
             str(target),
@@ -176,6 +203,7 @@ def on_submit_guess(guess, state):
         )
 
     left = 3 - attempts
+    # Still playing: keep inputs active and keep trace hidden.
     return (
         _state(arr=arr, target=target, attempts=attempts, active=True, steps=steps, trace=trace, score=score),
         str(target),
@@ -189,6 +217,8 @@ def on_submit_guess(guess, state):
 
 
 def on_reset():
+    """Reset the UI back to defaults (including score)."""
+    # Outputs must match the `outputs=[...]` order in the event binding.
     return (
         _state(score=0),
         [],
@@ -210,6 +240,7 @@ CSS = "#restart_btn button{font-size:20px;padding:18px 20px;width:100%}"
 
 
 with gr.Blocks(title="Binary Search Steps Game") as demo:
+    # UI layout + event wiring.
     gr.Markdown("# Binary Search Steps Game")
 
     state = gr.State(_state(score=0))
