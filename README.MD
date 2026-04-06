@@ -61,6 +61,7 @@ test case 6: update score on win
   - Steps: Click `Start Game`, then when correct answer is given by user
   Check: Status says correct, Trace is visible, Score increases by `1`, `Restart Game` button appears, Guess/Submit disable
 
+VERIFICATION OF TESTS IS IN images/ 
 
 #### Steps to Run
 1) Create and activate a virtual environment:
