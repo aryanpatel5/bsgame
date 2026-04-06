@@ -35,6 +35,9 @@ test case 1
   - Steps: Preset=`evenly_spaced`, List size=`5`, Start=`3`, Step=`2`, click `Generate Set`.
   - Check: List table shows `(index,value)` = `(0,3) (1,5) (2,7) (3,9) (4,11)`.
 
+
+
+
 test case 2
   - Steps: Preset=`evenly_spaced`, Step=`0` (or `-1`), click `Generate Set`.
   - Check: Error
