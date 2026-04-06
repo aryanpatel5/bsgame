@@ -1,5 +1,5 @@
 # BINARY SEARCH GAME
-I chose binary search and this version of a game alongside it because I personally became victim to memorizing bits code instead of grasping a genuine undertanding of the idea. Jumping stright into asking the user how many steps are required in the list to reach the target essentially forces them to run the whole search in their head with the generated set on the screen as a guide.
+I chose binary search and this version of a game alongside it because I personally became victim to memorizing bits code instead of grasping a genuine undertanding of the idea. Jumping straight into asking the user how many steps are required in the list to reach the target essentially forces them to run the whole search in their head with the generated set on the screen as a guide.
 
 ## Decomposition
 1) select a value for the amount of digits you would like in the list via a slider
@@ -66,9 +66,8 @@ test case 6: update score on win
 4) Open the local Gradio URL printed in the terminal.
 
 ##### Hugging Face Link
-- Deployed app : https://huggingface.co/spaces/<ap555>/<bsapp>
+- Deployed app : https://huggingface.co/spaces/ap555/bsapp
 
 ###### Author 
 - Aryan Patel
 - 20471645
-- CISC 121 002
