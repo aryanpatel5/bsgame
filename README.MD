@@ -41,7 +41,7 @@ test case 2
   - Steps: Preset=`evenly_spaced`, Step=`0` (or `-1`), click `Generate Set`.
   - Check: Error
 
-![photo](images/image(11).png)
+![Test Case](images/image (11).png)
 
 test case 3
   - Steps: Preset=`primes`, List size=`10`, click `Generate Set`.
